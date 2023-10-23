@@ -99,7 +99,9 @@ public class ZyxApplicationContext {
             }
             
             // 初始化
-            
+            if (instance instanceof InitillizingBean){
+                ((InitillizingBean) instance).afterPropertiesSet();
+            }
             
         }
         catch (Exception e) {
