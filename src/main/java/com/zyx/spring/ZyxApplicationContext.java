@@ -127,7 +127,7 @@ public class ZyxApplicationContext {
             
             // 初始化前
             for (var item : beanPostProcessors) {
-                item.postProcessBeforeInitialization(instance, beanName);
+                instance = item.postProcessBeforeInitialization(instance, beanName);
             }
             
             // 初始化
@@ -137,7 +137,7 @@ public class ZyxApplicationContext {
             
             // BeanPostProcessor 初始化后 AOP
             for (var item : beanPostProcessors) {
-                item.postProcessAfterInitialization(instance, beanName);
+                instance = item.postProcessAfterInitialization(instance, beanName);
             }
             
         }

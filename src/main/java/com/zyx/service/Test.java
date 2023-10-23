@@ -6,7 +6,7 @@ public class Test {
     public static void main(String[] args) {
        var applicationContext = new ZyxApplicationContext(AppConfig.class);
        
-       UserService userService = (UserService)applicationContext.getBean("userService");
+       UserInterface userService = (UserInterface)applicationContext.getBean("userService");
        userService.test();
         
     }

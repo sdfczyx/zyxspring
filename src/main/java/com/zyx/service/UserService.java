@@ -6,11 +6,12 @@ import com.zyx.spring.Compont;
 import com.zyx.spring.InitillizingBean;
 
 @Compont
-public class UserService {
+public class UserService implements UserInterface{
     
     @Autowired
     private OrderService   orderService;
     
+    @Override
     public void test(){
         System.out.println(orderService);
     }
