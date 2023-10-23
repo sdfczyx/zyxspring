@@ -2,7 +2,10 @@ package com.zyx.spring;
 
 import java.beans.Introspector;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,7 +13,8 @@ public class ZyxApplicationContext {
     private Class<?> configClass;
     
     private ConcurrentHashMap<String, BeanDefinition> beanDefinitionMap = new ConcurrentHashMap<>();
-    ConcurrentHashMap<String, Object> singletonObjects = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<String, Object> singletonObjects = new ConcurrentHashMap<>();
+    private List<BeanPostProcessor> beanPostProcessors = new ArrayList<>();
     
     
     public ZyxApplicationContext(Class<?> configClass){
@@ -38,6 +42,11 @@ public class ZyxApplicationContext {
                             Class<?> clazz = classLoader.loadClass(className);
                             if (clazz.isAnnotationPresent(Compont.class)) {
                                 
+                                // 扫描的时候, 保存 BeanPostProcessor
+                                if (BeanPostProcessor.class.isAssignableFrom(clazz)){
+                                    beanPostProcessors.add((BeanPostProcessor)clazz.getConstructor().newInstance());
+                                }
+                                
                                 String beanName = clazz.getAnnotation(Compont.class).value();
                                 if("".equals(beanName)){
                                     beanName =  Introspector.decapitalize(clazz.getSimpleName());
@@ -56,6 +65,24 @@ public class ZyxApplicationContext {
                                 
                             }
                         } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (InstantiationException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IllegalAccessException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IllegalArgumentException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (InvocationTargetException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (NoSuchMethodException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (SecurityException e) {
+                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
                     }
@@ -98,9 +125,19 @@ public class ZyxApplicationContext {
                 ((BeanNameAware) instance).setBeanName(beanName);
             }
             
+            // 初始化前
+            for (var item : beanPostProcessors) {
+                item.postProcessBeforeInitialization(instance, beanName);
+            }
+            
             // 初始化
             if (instance instanceof InitillizingBean){
                 ((InitillizingBean) instance).afterPropertiesSet();
+            }
+            
+            // BeanPostProcessor 初始化后 AOP
+            for (var item : beanPostProcessors) {
+                item.postProcessAfterInitialization(instance, beanName);
             }
             
         }

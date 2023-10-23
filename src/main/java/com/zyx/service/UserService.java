@@ -6,29 +6,15 @@ import com.zyx.spring.Compont;
 import com.zyx.spring.InitillizingBean;
 
 @Compont
-public class UserService implements BeanNameAware, InitillizingBean{
+public class UserService {
     
     @Autowired
     private OrderService   orderService;
-    
-    private String beanName;
-    private String initVar;
     
     public void test(){
         System.out.println(orderService);
     }
 
-    @Override
-    public void setBeanName(String name) {
-        beanName = name;
-    }
-
-    @Override
-    public void afterPropertiesSet() {
-        initVar = "OK";
-        System.out.println("UserService.afterPropertiesSet()");
-        
-    }
     
     
 }
